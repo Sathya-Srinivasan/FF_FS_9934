@@ -1,0 +1,303 @@
+ packagecom.hcl.day28;
+ com.pacakge.day28.serialisation
+ com.pacakge.day28.deserialisation
+ import java.io.FileNotFoundException
+ import java.io.ObjectOutputStream
+
+ /**
+ *Day # 28
+ *
+ *Topic: CoreJava
+ *
+ *@author Sathya
+ *
+ */
+
+
+ public class HclBank{
+
+ /**
+ *param args
+ */
+
+  private int accountNo;
+  private String name;
+  private float balanceAccount;
+
+
+ /**
+ *@param accountNo
+ *@param name
+ *@param balance
+ */
+
+  public HclBank(int accountNo, String name, float balanceAccount)
+   {
+  this.accountNo=accountNo;
+  this.name=name;
+  this.balanceAccount=balanceAccount;
+   }
+
+
+  public String getName()
+   {
+     return name;
+   }
+
+  public void setName(String name)
+  {
+    this.name= name;
+  }
+
+  public void getAccountNo
+  {
+    return accountNo;
+  }
+
+  public void setAccountNo(int accountNo)
+  {
+   this.accountNo=accountNo;
+  }
+
+
+ public float getBalance()
+  {
+   return balance;
+  }
+
+
+  public void setBalance(float balance)
+   {
+   this.balance=balance;
+   }
+
+
+
+
+
+
+
+
+
+  public class HclBankMain {
+
+      ArrayList<String> hclBanklist = new ArrayList<>();
+      static Connection connection = null;
+      {
+       try {
+         Class.forName("com.mysql.cj.jdbc.Driver");
+         connection = DriverManager.getConnection("jdbc:" +
+         "mysql://localhost:3306/mysql", "root", "gowthamanearth24");
+          } 
+      catch (Exception e) {
+         System.out.println("Connection is not proper");
+         }
+      }
+
+ /**
+ * This takes the input from the user and prints results. Input: Enter
+ * command:add Output: Account number:123456789 Name:Sathya Balance($):9450
+ * 
+ * @param args
+ * @throws ClassNotFoundException
+ * @throws SQLException
+ */
+
+
+FileInputStream file=null;
+ObjectInputStream obj = null;
+try {
+file = new FileInputStream("hclbank.txt");
+obj = new ObjectInputStream(file);
+bankList1= (ArrayList) obj.readObject();
+file.close();
+obj.close();
+
+} catch (Exception e) {
+System.out.println("error in reading file:"+e.getMessage());
+}
+
+
+
+  public static void main(String[] args) throws Exception {
+
+    HclBankMain hclBankMain = new HclBankMain();
+    Scanner sc = new Scanner(System.in);
+    String command = null;
+    System.out.println("Welcome to HCL Bank Portal!\n"); 
+
+
+    Thread one = new Thread(r);
+    Thread two = new Thread(r);
+    one.setName("Sathya");
+    two.setName("Sam");
+    one.start();
+    two.start();
+  @override
+  public void run(){
+     for(int x=0;x<5;x++)
+     {
+    makeWithdrawl(1000);
+      if(HclBankMain.getBalance()<0)
+        {
+       system.ou.println("Account is overdrawn");
+        }
+      }
+    }
+
+
+  private void makeWithdrawl(int balanceAccount){
+    if(HclBankMain.getBalance()){
+
+     sysytem.out.println("completes withdrawl" + Thread.currentThread().getName());
+   }
+     else
+     {
+       sysytem.out.println("No amount for withdrawl" + Thread.currentThread().getName());
+      }
+
+      do {
+         System.out.println("Enter the command:add/balance/quit");
+         command = sc.nextLine();
+ 
+    switch (command.toLowerCase()) {
+       case "add":
+        hclBankMain.add(sc);
+        sc.nextLine();
+       break;
+       case "balance":
+        hclBankMain.balance(sc);
+        sc.nextLine();
+       break;
+
+       case "quit":
+         System.out.println("Good bye!");
+        break;
+         default:
+         System.out.println("Sorry, but " + command + " is not a valid command. Please try again.\n");
+
+       }
+     } while (!command.contentEquals("quit"));
+
+         sc.close();
+
+     }
+
+
+
+
+
+// This balance method is used to display the values.
+
+
+ private void balance(Scanner sc) {
+     try {
+       System.out.println("Enter Account Number:");
+       int accountNo = sc.nextInt();
+       DecimalFormat formatter = new DecimalFormat("#,###.00");
+       PreparedStatement st = connection.prepareStatement("select * from HCLBank where accountnumber=?");
+       st.setInt(1, accountNo);
+       ResultSet rs = st.executeQuery();
+
+     if (rs.isBeforeFirst()) {
+        while (rs.next()) {
+        hclBanklist.add(rs.getLong(1) + "\t" + rs.getString(2) + "\t$" + formatter.format(rs.getFloat(3)));
+         }
+
+     for (String array : hclBanklist) {
+         System.out.println(array);
+        }
+     } 
+    else {
+      System.out.println("No account exists for this account number");
+         }
+
+    rs.close();
+    st.close();
+
+   } catch (Exception e) {
+       System.out.println("Exception in balance" + e.getMessage());
+     }
+}
+
+
+
+// This add method calls inserHclBank method.
+
+  private boolean add(Scanner sc) {
+     Scanner sc1 = new Scanner(System.in);
+
+      try {
+        System.out.println("Account Number:");
+        int accountNo = sc.nextLong();
+
+      try {
+         PreparedStatement st = connection.prepareStatement("select * from HCLBank where accountnumber=?");
+         st.setLong(1, accountNo);
+         ResultSet rs = st.executeQuery();
+
+      if (rs.isBeforeFirst()) {
+         System.out.println("The account Number already exists.");
+         }
+
+     else {
+        System.out.println(" Name:");
+        String name = sc1.nextLine();
+
+        System.out.println("Balance ($):");
+     try {
+        Float balance = sc.nextFloat();
+        insertHclBank(new HclBank(accountNo, name, balance));
+        rs.close();
+          } 
+     catch (Exception e) {
+        System.out.println("Enter the correct balance($):");
+         }
+       }
+     } 
+     catch (Exception e) {
+        System.out.println("Account Number is incorrect.");
+       }
+    }
+     catch (Exception e) {
+     System.out.println("Exception in add" + e.getMessage());
+   }
+     return true;
+}
+
+
+
+// This method insertHclBank insert the values into the table.
+
+ private void insertHclBank(HclBank hclBank)  {
+   try {
+     PreparedStatement st = connection.prepareStatement("insert into HCLBank values(?,?,?)");
+     st.setLong(1, hclBank.getAccountno());
+     st.setString(2, hclBank.getName());
+     st.setFloat(3, hclBank.getBalance());
+     st.executeUpdate();
+     st.close();
+       } 
+   catch (Exception e) {
+      System.out.println(e);
+      }
+
+}
+
+
+try {
+FileOutputStream fos= new FileOutputStream("hclbank.txt");
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+oos.writeObject(bankList1);
+oos.close();
+fos.close();
+System.out.println("sucess");
+}catch(Exception e) {
+System.out.println("Exception occured when writting into the file:"+e.getMessage());;
+}
+
+
+
+write in add method after reading from user:
+
+bankList1.add(account_number +" "+name+" "+balance);
