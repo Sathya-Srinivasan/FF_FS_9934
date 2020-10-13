@@ -1,9 +1,5 @@
-package com.hcl.day30;
+package com.hcl.day29a;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -23,7 +19,6 @@ import com.hcl.day29.*;
  */
 public class MiniBankMain {
 	ArrayList<MiniBank> banklist = new ArrayList<MiniBank>();
-	private double withdrawAmount;
 
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
@@ -56,7 +51,9 @@ public class MiniBankMain {
 				case "deposit":
 					bank.deposit(input);
 					break;
-
+				case "fundTransfer":
+					bank.fundTransfer(input);
+					break;
 				case "quit":
 					System.out.println("Good Bye");
 					break;
@@ -76,6 +73,34 @@ public class MiniBankMain {
 		catch (Exception e) {
 			System.out.println("Valid data must be entered" + e.getMessage());
 		}
+	}
+
+	private void fundTransfer(Scanner input) {
+		System.out.println("From Account");
+		int fromAccount = input.nextInt();
+		if (checkAccount(fromAccount)) {
+			System.out.println("Amount to be transfered");
+			int amount = input.nextInt();
+			System.out.println("To Account");
+			int toAccount = input.nextInt();
+			if (checkAccount(toAccount)) {
+				Account obj = new Account();
+				WithdrawThread wThread = new WithdrawThread(obj, amount, fromAccount, banklist);
+				Thread thread = new Thread(wThread, "ATM");
+				thread.start();
+				System.out.println("Sender's withdrawl is Successfull");
+				DepositThread dThread = new DepositThread(obj, amount, toAccount, banklist);
+				Thread thread1 = new Thread(dThread, "ATM");
+				thread1.start();
+				System.out.println("Receiver's deposit is Successfull");
+			} else {
+				System.out.println("No");
+			}
+
+		} else {
+			System.out.println("No");
+		}
+
 	}
 
 	/**
@@ -101,7 +126,7 @@ public class MiniBankMain {
 	}
 
 	/**
-	 * Balance Method
+	 * This Balance Method is used to check the balanceof the user
 	 * 
 	 * @param input
 	 * 
@@ -124,6 +149,13 @@ public class MiniBankMain {
 		return;
 	}
 
+	/**
+	 * 
+	 * This withdraw method is used to withdraw the amount from the user's account
+	 * number
+	 * 
+	 * @param input
+	 */
 	void withdraw(Scanner input) {
 		System.out.println("Account Number");
 		int accountNumber = input.nextInt();
@@ -148,48 +180,70 @@ public class MiniBankMain {
 
 	}
 
-	void deposit(Scanner input) {
-    	  System.out.println("Account Number");
-          int accountNumber = input.nextInt();
-     	 
-     	  for(MiniBank bank :banklist) {
-     	 
-       		 if(bank.getAccountNumber() == accountNumber)
-       		 {
-       			 System.out.println("Deposit amount:");
-       			 double depositAmount = input.nextDouble();
-       			 Account obj = new Account();
-       			 DepositThread dThread = new DepositThread(obj, depositAmount, accountNumber, banklist);
-       			 Thread thread = new Thread(dThread, "ATM");
-       			 thread.start();
-       			 try {
-       	 			 Thread.sleep(1000);
-       	 		 }
-       	 		 catch(Exception e)
-       	 		 {
-       	 			 System.out.println("Exceptiom occured" + e);
-       	 		 } 
-       			
-       		 }
-      }
-      
+	/**
+	 * 
+	 * This deposit method is used to deposit the amount to the user's account
+	 * number
+	 * 
+	 * @param input
+	 */
+	public void deposit(Scanner input) {
+		System.out.println("Account Number");
+		int accountNumber = input.nextInt();
 
-     	    void fundtransfer(Scanner input1) {
-     		System.out.println("Give Account Number");
-     		int fromAccountNumber1 = input.nextInt();
-     	int balance = balance(fromAccountNumber1);
-     		if(balance !=-1)
-     		{
-     			System.out.println("To account Number");
-     			int toAccountNumber1 = input.nextInt();
-     			Account acn = new Account(fromAccountNumber, banklist,balance,toAccountNumber1);
-     	 System.out.println("Transfer Amount");
-     			TransferThread tThread = new TransferThread(acn, input.nextDouble(), toAccountNumber1, banklist);
-     			Thread thread2 = new (tThread, "online");
-     					thread2.start();
-     					
-     		}
-     	    }
-    	  
-      }
+		for (MiniBank bank : banklist) {
+
+			if (bank.getAccountNumber() == accountNumber) {
+				System.out.println("Deposit amount:");
+				double depositAmount = input.nextDouble();
+				Account obj = new Account();
+				DepositThread dThread = new DepositThread(obj, depositAmount, accountNumber, banklist);
+				Thread thread = new Thread(dThread, "ATM");
+				thread.start();
+				try {
+					Thread.sleep(1000);
+				} catch (Exception e) {
+					System.out.println("Exceptiom occured" + e);
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * This method is used checking whether the account number is valid or not
+	 * 
+	 * @param accountNumber
+	 */
+
+	private boolean checkAccount(int accountNumber) {
+		for (MiniBank list : banklist) {
+			if (list.getAccountNumber() == accountNumber) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	interface Bank{
+		/**
+		 * This method is used for making the account to null so that it goes to inactive
+		 * 
+		 * @param
+		 */
+		
+		
+		public default boolean closeAccount(MiniBank a)  { 
+			try{
+		
+			a.setInActive(true);
+			System.out.println("Account is closed");
+			return true;
+		}catch(Exception e) {
+			System.out.println("Error in closing account");
+		}
+			return false;
+	}
+	}
 }
